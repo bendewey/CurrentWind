@@ -59,20 +59,16 @@ def getwind_api():
 
 stoplight = Stoplight()
 
-def bgThread():
-    count = 1
-    print('bg starting')
-    while True:
-        print('in loop')
-        count = count + 1
-        #App.app.setText(count)
-        stoplight.flash()
-        time.sleep(1)
-    
-x = threading.Thread(target=BackgroundWeatherMonitor, args=(stoplight,))
-x.start()
+monitor = BackgroundWeatherMonitor(stoplight)
+monitorThread = threading.Thread(target=monitor.run, args=())
+monitorThread.start()
+
+def on_closing():
+   monitor.kill()
+   stoplight.cleanup()
 
 if __name__ == "__main__":
+    stoplight.protocol("WM_DELETE_WINDOW", on_closing)
     stoplight.mainloop()
 
 print('Program ended')

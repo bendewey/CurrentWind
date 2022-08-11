@@ -11,7 +11,7 @@ class WeatherReporter:
     def loadRequired(self):
         delta = datetime.datetime.now() - self.lastChecked
         print('checking delta ' + str(delta))
-        return delta.total_seconds() > 5
+        return delta.total_seconds() > 5 * 60
 
     def invalidate(self):
         self.latest = -1
