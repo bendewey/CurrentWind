@@ -1,4 +1,7 @@
-import RPi.GPIO as GPIO
+try:
+    import RPi.GPIO as GPIO
+except:
+    print('no RPi')
 import time
 from tkinter import Tk
 from tkinter import Canvas
