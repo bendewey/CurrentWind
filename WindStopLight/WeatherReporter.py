@@ -47,3 +47,4 @@ class NoaaWindReporter(WeatherReporter):
             print('wind error occurred')
             print(e)
             self.latest -1
+            self.lastChecked = datetime.datetime.now()

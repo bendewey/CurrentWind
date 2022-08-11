@@ -1,20 +1,12 @@
-import RPi.GPIO as GPIO
+import StopLight
 import time
 import requests
 import json
 from StopLightColors import StopLightColor
 import WeatherReporter as weather
 
-def double_flash_leds(pin1, pin2, times):
-    for _ in range(times):
-        GPIO.output(pin1, GPIO.HIGH)
-        GPIO.output(pin2, GPIO.HIGH)
-        time.sleep(0.5)
-        GPIO.output(pin1, GPIO.LOW)
-        GPIO.output(pin2, GPIO.LOW)
-        time.sleep(0.5)
 
-  
+
 def getsurf_stormglass():
     try:
         apikey = '14691b2a-18c2-11ed-a3aa-0242ac130002-14691ba2-18c2-11ed-a3aa-0242ac130002'
@@ -60,14 +52,9 @@ def getwind_api():
     print('wind is ' + str(wind))
     return wind;
 
-RED_LED_PIN = 22
-YELLOW_LED_PIN = 27
-GREEN_LED_PIN = 17
-
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(RED_LED_PIN, GPIO.OUT)
-GPIO.setup(YELLOW_LED_PIN, GPIO.OUT)
-GPIO.setup(GREEN_LED_PIN, GPIO.OUT)
+#stoplight = StopLight.RPiStoplight()
+stoplight = StopLight.UiStopLight()
+stoplight.init()
 
 # Pause for 1 minute
 #time.sleep(60)
@@ -77,9 +64,7 @@ currentReporter = windReporter
 try:
     while True:
         if currentReporter.loadRequired():
-            GPIO.output(RED_LED_PIN, GPIO.LOW)
-            GPIO.output(YELLOW_LED_PIN, GPIO.LOW)
-            GPIO.output(GREEN_LED_PIN, GPIO.LOW)
+            stoplight.all_off()
             
             currentReporter.loadLatest()
             color = currentReporter.calculateRange()
@@ -87,29 +72,23 @@ try:
             if color == StopLightColor.RED:
                 # it's not windy
                 print('Red light')
-                GPIO.output(RED_LED_PIN, GPIO.HIGH)
-                GPIO.output(YELLOW_LED_PIN, GPIO.LOW)
-                GPIO.output(GREEN_LED_PIN, GPIO.LOW)
+                stoplight.red_on()
             elif color == StopLightColor.YELLOW:
                 # it's heating up
                 print('Yellow light')
-                GPIO.output(RED_LED_PIN, GPIO.LOW)
-                GPIO.output(YELLOW_LED_PIN, GPIO.HIGH)
-                GPIO.output(GREEN_LED_PIN, GPIO.LOW)
+                stoplight.yellow_on()
             elif color == StopLightColor.GREEN:
                 # Go kiting!
                 print('Green light')
-                GPIO.output(RED_LED_PIN, GPIO.LOW)
-                GPIO.output(YELLOW_LED_PIN, GPIO.LOW)
-                GPIO.output(GREEN_LED_PIN, GPIO.HIGH)
+                stoplight.green_on()
             else:
                 print('Blink Red/yellow light')
-                double_flash_leds(RED_LED_PIN, YELLOW_LED_PIN, 5) 
+                stoplight.flash() 
         time.sleep(1)
         
 except KeyboardInterrupt:
-    GPIO.cleanup()
+    stoplight.cleanup()
 except Exception as e:
-    print('Error occurred')
+    print('App error occurred')
     print(e)
 print('Program ended')
