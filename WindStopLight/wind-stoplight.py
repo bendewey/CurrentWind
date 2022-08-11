@@ -1,8 +1,9 @@
-import RPi. GPIO as GPIO
+import RPi.GPIO as GPIO
 import time
 import requests
 import json
-import re
+from StopLightColors import StopLightColor
+import WeatherReporter as weather
 
 def double_flash_leds(pin1, pin2, times):
     for _ in range(times):
@@ -51,20 +52,6 @@ def getsurf_stormglass():
         print(e)
         return -1, -1
 
-
-def getwind_noaa():
-    try:
-        print('retrieving wind from noaa')
-        station = 'fbis1'
-        r = requests.get("http://www.ndbc.noaa.gov/station_page.php?station=" + station)
-        pageContent = r.text
-        x = re.search("Continuous Winds((.|\\r|\\n)(?!\\d+\\skts))*\\s*((\\d+)\\s+kts)", pageContent)
-        wind = int(x.groups()[3])
-        print('wind is ' + str(wind))
-        return wind;
-    except:
-        return -1
-
 def getwind_api():
     print('retrieving wind')
     r = requests.get('https://currentwind.azurewebsites.net/WeatherForecast?station=fbis1')
@@ -83,37 +70,43 @@ GPIO.setup(YELLOW_LED_PIN, GPIO.OUT)
 GPIO.setup(GREEN_LED_PIN, GPIO.OUT)
 
 # Pause for 1 minute
-time.sleep(60)
+#time.sleep(60)
+windReporter = weather.NoaaWindReporter()
+currentReporter = windReporter
 
 try:
     while True:
-        wind = getwind_noaa()
-        if wind == -1:
-            print('Blink Red/yellow light')
-            double_flash_leds(RED_LED_PIN, YELLOW_LED_PIN, 5)  
-        elif wind < 10:
-            # it's not windy
-            print('Red light')
-            GPIO.output(RED_LED_PIN, GPIO.HIGH)
-            GPIO.output(YELLOW_LED_PIN, GPIO.LOW)
-            GPIO.output(GREEN_LED_PIN, GPIO.LOW)
-        elif wind < 15:
-            # it's heating up
-            print('Yellow light')
-            GPIO.output(RED_LED_PIN, GPIO.LOW)
-            GPIO.output(YELLOW_LED_PIN, GPIO.HIGH)
-            GPIO.output(GREEN_LED_PIN, GPIO.LOW)
-        else:
-            # Go kiting!
-            print('Green light')
+        if currentReporter.loadRequired():
             GPIO.output(RED_LED_PIN, GPIO.LOW)
             GPIO.output(YELLOW_LED_PIN, GPIO.LOW)
-            GPIO.output(GREEN_LED_PIN, GPIO.HIGH)
-        # Pause for 5 minutes
-        time.sleep(60*5)
-        GPIO.output(RED_LED_PIN, GPIO.LOW)
-        GPIO.output(YELLOW_LED_PIN, GPIO.LOW)
-        GPIO.output(GREEN_LED_PIN, GPIO.LOW)
+            GPIO.output(GREEN_LED_PIN, GPIO.LOW)
+            
+            currentReporter.loadLatest()
+            color = currentReporter.calculateRange()
+            
+            if color == StopLightColor.RED:
+                # it's not windy
+                print('Red light')
+                GPIO.output(RED_LED_PIN, GPIO.HIGH)
+                GPIO.output(YELLOW_LED_PIN, GPIO.LOW)
+                GPIO.output(GREEN_LED_PIN, GPIO.LOW)
+            elif color == StopLightColor.YELLOW:
+                # it's heating up
+                print('Yellow light')
+                GPIO.output(RED_LED_PIN, GPIO.LOW)
+                GPIO.output(YELLOW_LED_PIN, GPIO.HIGH)
+                GPIO.output(GREEN_LED_PIN, GPIO.LOW)
+            elif color == StopLightColor.GREEN:
+                # Go kiting!
+                print('Green light')
+                GPIO.output(RED_LED_PIN, GPIO.LOW)
+                GPIO.output(YELLOW_LED_PIN, GPIO.LOW)
+                GPIO.output(GREEN_LED_PIN, GPIO.HIGH)
+            else:
+                print('Blink Red/yellow light')
+                double_flash_leds(RED_LED_PIN, YELLOW_LED_PIN, 5) 
+        time.sleep(1)
+        
 except KeyboardInterrupt:
     GPIO.cleanup()
 except Exception as e:
