@@ -11,7 +11,7 @@ class WeatherReporter:
     def loadRequired(self):
         delta = datetime.datetime.now() - self.lastChecked
         print('checking delta ' + str(delta))
-        return delta.total_seconds() > 5 * 60
+        return delta.total_seconds() > 5
 
     def invalidate(self):
         self.latest = -1
@@ -40,6 +40,7 @@ class NoaaWindReporter(WeatherReporter):
             pageContent = r.text
             x = re.search("Continuous Winds((.|\\r|\\n)(?!\\d+\\skts))*\\s*((\\d+)\\s+kts)", pageContent)
             wind = int(x.groups()[3])
+            wind = 16
             print('wind is ' + str(wind))
             self.latest = wind;
             self.lastChecked = datetime.datetime.now()

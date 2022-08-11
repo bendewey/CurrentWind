@@ -4,32 +4,30 @@ except:
     print('no RPi')
 import time
 from tkinter import Tk
+from tkinter import Label
 from tkinter import Canvas
-import threading
- 
 
+class UiStopLightApp(Tk):
+    def __init__(self):
+        super().__init__()
 
-class UiStopLight:
-    def runwindow(self, window):
-        window.mainloop()
+        self.geometry("400x400")
+        self.configure(background = "grey")
+        self.title("UI Stoplight")
+        self.resizable(True, True)
+
+        self.create_canvas()
+
         
-    def init(self):
-        self.window = Tk()
-        self.window.geometry("400x400")
-        self.window.configure(background = "grey")
-        self.window.title("UI Stoplight")
-        self.window.resizable(False, False)
-         
+    def create_canvas(self):
         # setting up the canvas
-        self.canvas = Canvas(width = 350, height = 350, bg = "white")
+        self.title = Label(self, text = "UI Stoplight")
+        self.title.config(font = ("Helvetica", 24), background = "grey")
+        self.title.pack()
+
+        self.canvas = Canvas(width = 300, height = 300, bg = "White")
         self.canvas.pack(pady = 20)
-         
-        self.canvas.create_text(175, 20, text = "Stoplight", font = ("Arial", 30))
-        self.oval = self.canvas.create_oval(175, 100, 100, 175, width = 3, fill="red")
-        
-        #t = threading.Thread(target=self.runwindow, args=self.window)
-        #t.start();
-        self.window.mainloop()
+        self.oval = self.canvas.create_oval(200, 100, 100, 200, width = 3, outline ="grey", fill="red")
     
     def all_off(self):
         self.canvas.itemconfigure(self.oval, fill = "white")
@@ -44,13 +42,17 @@ class UiStopLight:
         self.canvas.itemconfigure(self.oval, fill = "green")
         
     def flash(self):
-        self.canvas.itemconfigure(self.oval, fill = "purple")
+        for _ in range(5):
+            self.canvas.itemconfigure(self.oval, fill = "orange")
+            time.sleep(0.5)
+            self.canvas.itemconfigure(self.oval, fill = "white")
+            time.sleep(0.5)
         
     def cleanup(self):
-        self.window.exit()
+        self.destroy()
         
 class RPiStoplight:
-    def init(self):
+    def __init__(self):
         self.RED_LED_PIN = 22
         self.YELLOW_LED_PIN = 27
         self.GREEN_LED_PIN = 17
@@ -59,7 +61,11 @@ class RPiStoplight:
         GPIO.setup(self.RED_LED_PIN, GPIO.OUT)
         GPIO.setup(self.YELLOW_LED_PIN, GPIO.OUT)
         GPIO.setup(self.GREEN_LED_PIN, GPIO.OUT)
-        
+    
+    def mainloop(self):
+        while True:
+            time.sleep(1)
+    
     def double_flash_leds(self, pin1, pin2, times):
         for _ in range(times):
             GPIO.output(pin1, GPIO.HIGH)
