@@ -13,9 +13,11 @@ def BackgroundWeatherMonitor(stoplight):
         while True:
             if currentReporter.loadRequired():
                 stoplight.all_off()
-                
+                stoplight.setStatus('Loading Weather')
+
                 currentReporter.loadLatest()
                 color = currentReporter.calculateRange()
+                stoplight.setStatus('')
                 
                 if color == StopLightColor.RED:
                     # it's not windy
