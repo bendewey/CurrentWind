@@ -4,7 +4,7 @@ try:
     #from Interface.UiStopLight import UiStopLightApp as Stoplight
 except:
     from Interface.UiStopLight import UiStopLightApp as Stoplight
-import BackgroundWeatherMonitor
+from BackgroundWeatherMonitor import BackgroundWeatherMonitor
 import threading
 from Reporters import *
 
