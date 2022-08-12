@@ -24,7 +24,7 @@ class UiStopLightApp(customtkinter.CTk):
  
     def create_canvas(self):
         # setting up the canvas
-        self.title = customtkinter.CTkLabel(self, text = "UI Stoplight")
+        self.title = customtkinter.CTkLabel(self, text = "Stoplight")
         self.title.config(font = ("Helvetica", 24), background = "grey")
         self.title.pack()
 
@@ -76,22 +76,30 @@ class UiStopLightApp(customtkinter.CTk):
         self.destroy()
         
 class RPiStoplight:
-    def __init__(self, reporters):
-        self.RED_LED_PIN = 22
-        self.YELLOW_LED_PIN = 27
-        self.GREEN_LED_PIN = 17
+    RED_LED_PIN = 22
+    YELLOW_LED_PIN = 27
+    GREEN_LED_PIN = 17
+    SWITCH_PIN = 23
 
+    def __init__(self, reporters):
+        self.switchStatus = False
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(self.RED_LED_PIN, GPIO.OUT)
-        GPIO.setup(self.YELLOW_LED_PIN, GPIO.OUT)
-        GPIO.setup(self.GREEN_LED_PIN, GPIO.OUT)
+        GPIO.setup(RPiStoplight.RED_LED_PIN, GPIO.OUT)
+        GPIO.setup(RPiStoplight.YELLOW_LED_PIN, GPIO.OUT)
+        GPIO.setup(RPiStoplight.GREEN_LED_PIN, GPIO.OUT)
+        GPIO.setup(RPiStoplight.SWITCH_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.add_event_detect(RPiStoplight.SWITCH_PIN, GPIO.FALLING, callback=self.switch_callback)
+        GPIO.add_event_detect(RPiStoplight.SWITCH_PIN, GPIO.RISING, callback=self.switch_callback)
     
+    def switch_callback(self, channel):
+        print('Switch Changed c=' + channel)
+
     def mainloop(self):
         while True:
             time.sleep(1)
     
     def getMode(self) -> StopLightMode:
-        return StopLightMode.WIND
+        return StopLightMode.WIND if GPIO.input(RPiStoplight.SWITCH_PIN) else StopLightMode.SURF
 
     def double_flash_leds(self, pin1, pin2, times):
         for _ in range(times):
@@ -109,27 +117,27 @@ class RPiStoplight:
         print('status : ' + text)
 
     def all_off(self):
-        GPIO.output(self.RED_LED_PIN, GPIO.LOW)
-        GPIO.output(self.YELLOW_LED_PIN, GPIO.LOW)
-        GPIO.output(self.GREEN_LED_PIN, GPIO.LOW)
+        GPIO.output(RPiStoplight.RED_LED_PIN, GPIO.LOW)
+        GPIO.output(RPiStoplight.YELLOW_LED_PIN, GPIO.LOW)
+        GPIO.output(RPiStoplight.GREEN_LED_PIN, GPIO.LOW)
         
     def red_on(self):
-        GPIO.output(self.RED_LED_PIN, GPIO.HIGH)
-        GPIO.output(self.YELLOW_LED_PIN, GPIO.LOW)
-        GPIO.output(self.GREEN_LED_PIN, GPIO.LOW)
+        GPIO.output(RPiStoplight.RED_LED_PIN, GPIO.HIGH)
+        GPIO.output(RPiStoplight.YELLOW_LED_PIN, GPIO.LOW)
+        GPIO.output(RPiStoplight.GREEN_LED_PIN, GPIO.LOW)
         
     def yellow_on(self):
-        GPIO.output(self.RED_LED_PIN, GPIO.LOW)
-        GPIO.output(self.YELLOW_LED_PIN, GPIO.HIGH)
-        GPIO.output(self.GREEN_LED_PIN, GPIO.LOW)
+        GPIO.output(RPiStoplight.RED_LED_PIN, GPIO.LOW)
+        GPIO.output(RPiStoplight.YELLOW_LED_PIN, GPIO.HIGH)
+        GPIO.output(RPiStoplight.GREEN_LED_PIN, GPIO.LOW)
         
     def green_on(self):
-        GPIO.output(self.RED_LED_PIN, GPIO.LOW)
-        GPIO.output(self.YELLOW_LED_PIN, GPIO.LOW)
-        GPIO.output(self.GREEN_LED_PIN, GPIO.HIGH)
+        GPIO.output(RPiStoplight.RED_LED_PIN, GPIO.LOW)
+        GPIO.output(RPiStoplight.YELLOW_LED_PIN, GPIO.LOW)
+        GPIO.output(RPiStoplight.GREEN_LED_PIN, GPIO.HIGH)
         
     def flash(self):
-        self.double_flash_leds(self.RED_LED_PIN, self.YELLOW_LED_PIN, 5)
+        self.double_flash_leds(RPiStoplight.RED_LED_PIN, RPiStoplight.YELLOW_LED_PIN, 5)
         
     def cleanup(self):
         GPIO.cleanup()
