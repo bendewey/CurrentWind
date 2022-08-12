@@ -4,13 +4,17 @@ import requests
 import json
 from StopLightColors import StopLightColor
 import Reporters.WeatherReporter as WeatherReporter
+from dotenv import load_dotenv
 
 class StormGlassSurfReporter(WeatherReporter):
-    USE_SAMPLE_DATA = False
-
-    def __init__(self):
+    def __init__(self, config):
         super().__init__()
         self.name = "StormGlass Surf"
+        if type(config) is dict:
+            print('converting to anon')
+            self.config = type('',(object,),config)
+        else:
+            self.config = config
 
     def getDateRangeForApi(self):
         now = datetime.datetime.now()
@@ -47,27 +51,20 @@ class StormGlassSurfReporter(WeatherReporter):
         return json_data
 
     def callApi(self):
-        apikey = '14691b2a-18c2-11ed-a3aa-0242ac130002-14691ba2-18c2-11ed-a3aa-0242ac130002'
-        lat = 32.78498
-        long = -79.78441
         beginHr, endHr = self.getDateRangeForApi()
         print('retrieving surf from stormglass')
         response = requests.get(
         'https://api.stormglass.io/v2/weather/point',
         params={
-            'lat': lat,
-            'lng': long,
+            'lat': self.config.lat,
+            'lng': self.config.long,
             'params': 'waveHeight,wavePeriod',
-            #'start': beginHr.isoformat() + "+00:00",
-            #'end': endHr.isoformat() + "+00:00",
-            #'start': "2022-08-12T14:00:00+00:00",
-            #'end': "2022-08-12T17:59:00+00:00",
-            'start': '2022-08-10T18:00:00+00:00',
-            'end': '2022-08-10T18:59:00+00:00',
+            'start': beginHr.isoformat() + "+00:00",
+            'end': endHr.isoformat() + "+00:00",
             'source': 'sg',
         },
         headers={
-            'Authorization': apikey
+            'Authorization': self.config.apiKey
         }
         )
 
@@ -76,7 +73,7 @@ class StormGlassSurfReporter(WeatherReporter):
 
     def loadLatest(self):
         try:
-            if StormGlassSurfReporter.USE_SAMPLE_DATA:
+            if self.config.useSampleData:
                 json_data = self.sampleApi()
             else:
                 json_data = self.callApi()

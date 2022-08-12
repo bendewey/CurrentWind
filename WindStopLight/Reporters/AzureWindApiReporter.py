@@ -3,15 +3,15 @@ import requests
 import Reporters.WeatherReporter as WeatherReporter
 
 class AzureWindApiReporter(WeatherReporter):
-    def __init__(self):
+    def __init__(self,station):
         super().__init__()
         self.name = "Azure API Wind"
+        self.station = station
 
     def loadLatest(self):
         try:
             print('retrieving wind from noaa')
-            station = 'fbis1'
-            r = requests.get('https://currentwind.azurewebsites.net/WeatherForecast?station=fbis1')
+            r = requests.get('https://currentwind.azurewebsites.net/WeatherForecast?station=' + self.station)
             forecast = r.json()
             wind = int(forecast["windSpeed"])
             print('wind is ' + str(wind))

@@ -1,4 +1,5 @@
 import datetime
+import os
 from StopLightColors import StopLightColor
 
 class WeatherReporter:
@@ -10,7 +11,8 @@ class WeatherReporter:
     def loadRequired(self):
         delta = datetime.datetime.now() - self.lastChecked
         print('checking delta ' + str(delta))
-        return delta.total_seconds() > 5 * 60
+        refreshInMinutes = int(os.getenv('REFRESH_MINUTES', '5'))
+        return delta.total_seconds() > refreshInMinutes * 60
 
     def invalidate(self):
         print(self.name + ' invalidated')

@@ -4,15 +4,15 @@ import requests
 import Reporters.WeatherReporter as WeatherReporter
 
 class NoaaWindReporter(WeatherReporter):
-    def __init__(self):
+    def __init__(self, station):
         super().__init__()
         self.name = "NOAA Wind"
+        self.station = station
 
     def loadLatest(self):
         try:
             print('retrieving wind from noaa')
-            station = 'fbis1'
-            r = requests.get("http://www.ndbc.noaa.gov/station_page.php?station=" + station)
+            r = requests.get("http://www.ndbc.noaa.gov/station_page.php?station=" + self.station)
             pageContent = r.text
             x = re.search("Continuous Winds((.|\\r|\\n)(?!\\d+\\skts))*\\s*((\\d+)\\s+kts)", pageContent)
             wind = int(x.groups()[3])
