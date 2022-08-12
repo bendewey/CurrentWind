@@ -3,10 +3,11 @@ try:
 except:
     print('no RPi')
 import time
-from tkinter import *
+import tkinter
+import customtkinter
 from StopLightModes import StopLightMode
 
-class UiStopLightApp(Tk):
+class UiStopLightApp(customtkinter.CTk):
     def __init__(self, reporters):
         super().__init__()
         self.reporters = reporters
@@ -15,26 +16,28 @@ class UiStopLightApp(Tk):
         self.configure(background = "grey")
         self.title("UI Stoplight")
         self.resizable(True, True)
+        
+        customtkinter.set_appearance_mode("System")  # Modes: system (default), light, dark
+        customtkinter.set_default_color_theme("dark-blue")  # Themes: blue (default), dark-blue, green
 
         self.create_canvas()
  
     def create_canvas(self):
         # setting up the canvas
-        self.title = Label(self, text = "UI Stoplight")
+        self.title = customtkinter.CTkLabel(self, text = "UI Stoplight")
         self.title.config(font = ("Helvetica", 24), background = "grey")
         self.title.pack()
 
-
-        self.checkVar = IntVar()
-        self.switch = Checkbutton(self, text = "Check Surf", variable=self.checkVar, command=self.checkChanged, onvalue=1, offvalue=0, background = "grey")
+        self.checkVar = tkinter.IntVar()
+        self.switch = customtkinter.CTkCheckBox(self, text = "Check Surf", variable=self.checkVar, command=self.checkChanged, onvalue=1, offvalue=0, background = "grey")
         self.switch.pack()
 
-        self.canvas = Canvas(width = 300, height = 300, bg = "White")
+        self.canvas = customtkinter.CTkCanvas(width = 300, height = 300, bg = "White")
         self.canvas.pack(pady = 20)
         self.oval = self.canvas.create_oval(200, 100, 100, 200, width = 3, outline ="grey", fill="white")
         
-        self.statusText = StringVar()
-        self.status = Label(self, textvariable = self.statusText)
+        self.statusText = tkinter.StringVar()
+        self.status = customtkinter.CTkLabel(self, textvariable = self.statusText)
         self.status.config(font = ("Helvetica", 14), background = "grey")
         self.status.pack()
     

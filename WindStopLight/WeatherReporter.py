@@ -16,7 +16,7 @@ class WeatherReporter:
         return delta.total_seconds() > 5 * 60
 
     def invalidate(self):
-        print('noaa invalidated')
+        print(self.name + ' invalidated')
         self.latest = -1
         self.lastChecked = datetime.datetime(2000,1,1)
         
