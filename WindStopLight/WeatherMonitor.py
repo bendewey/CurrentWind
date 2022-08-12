@@ -46,9 +46,6 @@ class BackgroundWeatherMonitor():
                         print('Blink Red/yellow light')
                         self.stoplight.flash() 
                 time.sleep(1)
-                
-        except KeyboardInterrupt:
-            self.stoplight.cleanup()
         except Exception as e:
             print('App error occurred')
             print(e)

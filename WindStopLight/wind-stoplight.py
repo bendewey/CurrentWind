@@ -22,7 +22,11 @@ def on_closing():
    stoplight.cleanup()
 
 if __name__ == "__main__":
-    stoplight.protocol("WM_DELETE_WINDOW", on_closing)
-    stoplight.mainloop()
+    try:
+        stoplight.protocol("WM_DELETE_WINDOW", on_closing)
+        stoplight.mainloop()
+    except KeyboardInterrupt:
+        monitor.kill()
+        stoplight.cleanup()
 
 print('Program ended')
