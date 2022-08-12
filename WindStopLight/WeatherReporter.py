@@ -125,9 +125,9 @@ class StormGlassSurfReporter(WeatherReporter):
         waveHeight, wavePeriod = self.latest
         if waveHeight == -1:
             return StopLightColor.ERROR
-        elif waveHeight < 10:
+        elif waveHeight < 1 or wavePeriod < 6:
             return StopLightColor.RED
-        elif waveHeight < 15:
+        elif waveHeight < 3 and wavePeriod < 8:
             return StopLightColor.YELLOW
         else:
             return StopLightColor.GREEN
