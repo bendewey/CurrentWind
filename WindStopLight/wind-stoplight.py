@@ -8,7 +8,7 @@ from WeatherMonitor import BackgroundWeatherMonitor
 import requests
 import json
 import threading
-
+import WeatherReporter as weather
 
 
 
@@ -57,9 +57,12 @@ def getwind_api():
     print('wind is ' + str(wind))
     return wind;
 
-stoplight = Stoplight()
+windReporter = weather.NoaaWindReporter()
+surfReporter = weather.NoaaWindReporter()
 
-monitor = BackgroundWeatherMonitor(stoplight)
+stoplight = Stoplight([windReporter, surfReporter])
+
+monitor = BackgroundWeatherMonitor(stoplight, windReporter, surfReporter)
 monitorThread = threading.Thread(target=monitor.run, args=())
 monitorThread.start()
 

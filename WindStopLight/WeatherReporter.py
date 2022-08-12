@@ -5,6 +5,7 @@ import datetime
 
 class WeatherReporter:
     def __init__(self):
+        self.name = "Weather"
         self.latest = -1
         self.lastChecked = datetime.datetime(2000,1,1)
 
@@ -14,6 +15,7 @@ class WeatherReporter:
         return delta.total_seconds() > 5 * 60
 
     def invalidate(self):
+        print('noaa invalidated')
         self.latest = -1
         self.lastChecked = datetime.datetime(2000,1,1)
         
@@ -32,6 +34,10 @@ class WeatherReporter:
             return StopLightColor.GREEN
 
 class NoaaWindReporter(WeatherReporter):
+    def __init__(self):
+        super().__init__()
+        self.name = "NOAA Wind"
+
     def loadLatest(self):
         try:
             print('retrieving wind from noaa')
@@ -40,9 +46,8 @@ class NoaaWindReporter(WeatherReporter):
             pageContent = r.text
             x = re.search("Continuous Winds((.|\\r|\\n)(?!\\d+\\skts))*\\s*((\\d+)\\s+kts)", pageContent)
             wind = int(x.groups()[3])
-            wind = 16
             print('wind is ' + str(wind))
-            self.latest = wind;
+            self.latest = wind
             self.lastChecked = datetime.datetime.now()
         except Exception as e:
             print('wind error occurred')

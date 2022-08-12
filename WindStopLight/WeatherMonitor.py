@@ -1,14 +1,14 @@
 import time
 from StopLightColors import StopLightColor
-import WeatherReporter as weather
-
-windReporter = weather.NoaaWindReporter()
-currentReporter = windReporter
+from StopLightModes import StopLightMode
 
 class BackgroundWeatherMonitor():
-    def __init__(self, stoplight):
+    def __init__(self, stoplight, windReporter, surfReporter):
         self.stoplight = stoplight
         self.isRunning = False
+        self.windReporter = windReporter
+        self.surfReporter = surfReporter
+        self.currentReporter = self.windReporter
 
     def run(self):
         try:
@@ -17,13 +17,19 @@ class BackgroundWeatherMonitor():
             self.isRunning = True
 
             while self.isRunning:
-                if currentReporter.loadRequired():
+                if self.currentReporter.loadRequired():
+                    
                     self.stoplight.all_off()
-                    self.stoplight.setStatus('Loading Weather')
+                    if self.stoplight.getMode() == StopLightMode.WIND:
+                        self.stoplight.setStatus('Loading Wind')
+                        self.currentReporter = self.windReporter
+                    else:
+                        self.stoplight.setStatus('Loading Surf')
+                        self.currentReporter = self.surfReporter
 
-                    currentReporter.loadLatest()
-                    color = currentReporter.calculateRange()
-                    self.stoplight.setStatus('')
+                    self.currentReporter.loadLatest()
+                    color = self.currentReporter.calculateRange()
+                    self.stoplight.setStatus(self.currentReporter.name + ' is ' + str(self.currentReporter.latest))
                     
                     if color == StopLightColor.RED:
                         # it's not windy

@@ -4,10 +4,12 @@ except:
     print('no RPi')
 import time
 from tkinter import *
+from StopLightModes import StopLightMode
 
 class UiStopLightApp(Tk):
-    def __init__(self):
+    def __init__(self, reporters):
         super().__init__()
+        self.reporters = reporters
 
         self.geometry("400x420")
         self.configure(background = "grey")
@@ -37,10 +39,16 @@ class UiStopLightApp(Tk):
         self.status.pack()
     
     def checkChanged(self):
+        print('checkChanged')
         self.setStatus('checked' if self.checkVar.get() == 1 else 'unchecked')
+        for r in self.reporters:
+            r.invalidate()
 
     def setStatus(self, text):
         self.statusText.set("Status: " + text)
+
+    def getMode(self) -> StopLightMode:
+        return StopLightMode.SURF if self.checkVar.get() == 1 else StopLightMode.WIND
 
     def all_off(self):
         self.canvas.itemconfigure(self.oval, fill = "white")
@@ -65,7 +73,7 @@ class UiStopLightApp(Tk):
         self.destroy()
         
 class RPiStoplight:
-    def __init__(self):
+    def __init__(self, reporters):
         self.RED_LED_PIN = 22
         self.YELLOW_LED_PIN = 27
         self.GREEN_LED_PIN = 17
@@ -79,6 +87,9 @@ class RPiStoplight:
         while True:
             time.sleep(1)
     
+    def getMode(self) -> StopLightMode:
+        return StopLightMode.WIND
+
     def double_flash_leds(self, pin1, pin2, times):
         for _ in range(times):
             GPIO.output(pin1, GPIO.HIGH)
@@ -90,7 +101,7 @@ class RPiStoplight:
 
     def protocol(self, msg, error):
         print('noop')
-        
+
     def setStatus(self, text):
         print('status : ' + text)
 
