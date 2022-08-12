@@ -1,8 +1,5 @@
-try:
-    import RPi.GPIO as GPIO
-except:
-    print('no RPi')
 import time
+import RPi.GPIO as GPIO
 from StopLightModes import StopLightMode
 
 class RPiStoplight:
