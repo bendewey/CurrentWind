@@ -25,7 +25,7 @@ class UiStopLightApp(customtkinter.CTk):
     def create_canvas(self):
         # setting up the canvas
         self.title = customtkinter.CTkLabel(self, text = "Stoplight")
-        self.title.config(font = ("Helvetica", 24), background = "grey")
+        self.title.configure(font = ("Helvetica", 24), background = "grey")
         self.title.pack()
 
         self.checkVar = tkinter.IntVar()
@@ -38,7 +38,7 @@ class UiStopLightApp(customtkinter.CTk):
         
         self.statusText = tkinter.StringVar()
         self.status = customtkinter.CTkLabel(self, textvariable = self.statusText)
-        self.status.config(font = ("Helvetica", 14), background = "grey")
+        self.status.configure(font = ("Helvetica", 14), background = "grey")
         self.status.pack()
     
     def checkChanged(self):
