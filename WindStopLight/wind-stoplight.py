@@ -1,9 +1,9 @@
 try:
     import RPi.GPIO as GPIO
-    from StopLight import RPiStoplight as Stoplight
+    from RPiStopLight import RPiStoplight as Stoplight
     #from StopLight import UiStopLightApp as Stoplight
 except:
-    from StopLight import UiStopLightApp as Stoplight
+    from UiStopLight import UiStopLightApp as Stoplight
 from WeatherMonitor import BackgroundWeatherMonitor
 import threading
 import WeatherReporter as weather
