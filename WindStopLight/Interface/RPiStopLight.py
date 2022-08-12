@@ -21,7 +21,7 @@ class RPiStoplight:
         GPIO.setup(RPiStoplight.SWITCH_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         GPIO.add_event_detect(RPiStoplight.SWITCH_PIN, GPIO.BOTH, callback=self.switch_callback)
     
-    def switch_callback(self, channel):
+    def switch_callback(self):
         for r in self.reporters:
             r.invalidate()
 
@@ -42,10 +42,10 @@ class RPiStoplight:
             time.sleep(0.5)
 
     def protocol(self, msg, error):
-        print('noop')
+        pass
 
     def setStatus(self, text):
-        print('status : ' + text)
+        pass
 
     def all_off(self):
         GPIO.output(RPiStoplight.RED_LED_PIN, GPIO.LOW)

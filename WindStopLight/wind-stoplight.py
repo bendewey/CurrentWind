@@ -1,15 +1,15 @@
 try:
     import RPi.GPIO as GPIO
-    from RPiStopLight import RPiStoplight as Stoplight
-    #from StopLight import UiStopLightApp as Stoplight
+    from Interface.RPiStopLight import RPiStoplight as Stoplight
+    #from Interface.UiStopLight import UiStopLightApp as Stoplight
 except:
-    from UiStopLight import UiStopLightApp as Stoplight
-from WeatherMonitor import BackgroundWeatherMonitor
+    from Interface.UiStopLight import UiStopLightApp as Stoplight
+import BackgroundWeatherMonitor
 import threading
-import WeatherReporter as weather
+from Reporters import *
 
-windReporter = weather.NoaaWindReporter()
-surfReporter = weather.StormGlassSurfReporter()
+windReporter = NoaaWindReporter()
+surfReporter = StormGlassSurfReporter()
 
 stoplight = Stoplight([windReporter, surfReporter])
 
