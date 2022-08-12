@@ -83,16 +83,17 @@ class RPiStoplight:
 
     def __init__(self, reporters):
         self.switchStatus = False
+        self.reporters = reporters
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(RPiStoplight.RED_LED_PIN, GPIO.OUT)
         GPIO.setup(RPiStoplight.YELLOW_LED_PIN, GPIO.OUT)
         GPIO.setup(RPiStoplight.GREEN_LED_PIN, GPIO.OUT)
         GPIO.setup(RPiStoplight.SWITCH_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-        GPIO.add_event_detect(RPiStoplight.SWITCH_PIN, GPIO.FALLING, callback=self.switch_callback)
-        GPIO.add_event_detect(RPiStoplight.SWITCH_PIN, GPIO.RISING, callback=self.switch_callback)
+        GPIO.add_event_detect(RPiStoplight.SWITCH_PIN, GPIO.BOTH, callback=self.switch_callback)
     
     def switch_callback(self, channel):
-        print('Switch Changed c=' + channel)
+        for r in self.reporters:
+            r.invalidate()
 
     def mainloop(self):
         while True:
