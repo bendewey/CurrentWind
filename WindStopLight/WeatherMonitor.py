@@ -18,7 +18,6 @@ class BackgroundWeatherMonitor():
 
             while self.isRunning:
                 if self.currentReporter.loadRequired():
-                    
                     self.stoplight.all_off()
                     if self.stoplight.getMode() == StopLightMode.WIND:
                         self.stoplight.setStatus('Loading Wind')
