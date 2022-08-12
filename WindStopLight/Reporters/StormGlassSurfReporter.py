@@ -6,6 +6,8 @@ from StopLightColors import StopLightColor
 import Reporters.WeatherReporter as WeatherReporter
 
 class StormGlassSurfReporter(WeatherReporter):
+    USE_SAMPLE_DATA = False
+
     def __init__(self):
         super().__init__()
         self.name = "StormGlass Surf"
@@ -41,7 +43,6 @@ class StormGlassSurfReporter(WeatherReporter):
     "requestCount": 1
   }
 }"""    
-        print(json_text)
         json_data = json.loads(json_text)
         return json_data
 
@@ -75,9 +76,11 @@ class StormGlassSurfReporter(WeatherReporter):
 
     def loadLatest(self):
         try:
-            json_data = self.sampleApi()
-            print(json_data)
-            
+            if StormGlassSurfReporter.USE_SAMPLE_DATA:
+                json_data = self.sampleApi()
+            else:
+                json_data = self.callApi()
+                        
             if "errors" in json_data:
                 raise Exception(json_data['errors']['key'])
             else:
